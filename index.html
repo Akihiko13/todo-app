@@ -167,6 +167,39 @@
       padding: 48px 0;
     }
 
+    /* 件数サマリー */
+    .summary {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
+    .summary-card .s-num {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .summary-card .s-label {
+      font-size: 11px;
+      color: #8e8e93;
+      margin-top: 2px;
+    }
+
+    .summary-card.s-todo  .s-num { color: #3c3c43; }
+    .summary-card.s-doing .s-num { color: #856404; }
+    .summary-card.s-done  .s-num { color: #155724; }
+    .summary-card.s-all   .s-num { color: #007aff; }
+
     /* 件数表示 */
     .count {
       font-size: 13px;
@@ -186,6 +219,8 @@
     <input type="text" id="taskInput" placeholder="タスクを入力…" autocomplete="off">
     <button type="submit">追加</button>
   </form>
+
+  <div class="summary" id="summary"></div>
 
   <div class="filters">
     <button class="filter-btn active" data-filter="all">すべて</button>
@@ -232,6 +267,31 @@
   }
 
   function render() {
+    const counts = {
+      all:   tasks.length,
+      todo:  tasks.filter(t => t.status === 'todo').length,
+      doing: tasks.filter(t => t.status === 'doing').length,
+      done:  tasks.filter(t => t.status === 'done').length,
+    };
+
+    document.getElementById('summary').innerHTML = `
+      <div class="summary-card s-all">
+        <div class="s-num">${counts.all}</div>
+        <div class="s-label">合計</div>
+      </div>
+      <div class="summary-card s-todo">
+        <div class="s-num">${counts.todo}</div>
+        <div class="s-label">未着手</div>
+      </div>
+      <div class="summary-card s-doing">
+        <div class="s-num">${counts.doing}</div>
+        <div class="s-label">着手中</div>
+      </div>
+      <div class="summary-card s-done">
+        <div class="s-num">${counts.done}</div>
+        <div class="s-label">完了</div>
+      </div>`;
+
     const visible = filter === 'all' ? tasks : tasks.filter(t => t.status === filter);
 
     document.getElementById('count').textContent =
