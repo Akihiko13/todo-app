@@ -51,11 +51,17 @@
     /* 入力エリア */
     .add-form {
       display: flex;
+      flex-direction: column;
       gap: 8px;
       margin-bottom: 24px;
     }
 
-    .add-form input {
+    .add-form-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .add-form input[type="text"] {
       flex: 1;
       padding: 12px 14px;
       border: 1px solid #d1d1d6;
@@ -66,8 +72,33 @@
       transition: border-color 0.15s;
     }
 
-    .add-form input:focus {
+    .add-form input[type="text"]:focus {
       border-color: #007aff;
+    }
+
+    .deadline-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #d1d1d6;
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+
+    .deadline-row label {
+      font-size: 14px;
+      color: #8e8e93;
+      white-space: nowrap;
+    }
+
+    .deadline-row input[type="time"] {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      color: #1d1d1f;
+      background: transparent;
     }
 
     .add-form button {
@@ -81,9 +112,22 @@
       cursor: pointer;
       transition: background 0.15s;
       white-space: nowrap;
+      width: 100%;
     }
 
     .add-form button:active { background: #0062cc; }
+
+    /* 締め切り表示 */
+    .deadline-tag {
+      font-size: 12px;
+      color: #8e8e93;
+      white-space: nowrap;
+    }
+
+    .deadline-tag.overdue {
+      color: #ff3b30;
+      font-weight: 600;
+    }
 
     /* フィルター */
     .filters {
@@ -235,7 +279,13 @@
 
 <div class="container">
   <form class="add-form" id="addForm">
-    <input type="text" id="taskInput" placeholder="タスクを入力…" autocomplete="off">
+    <div class="add-form-row">
+      <input type="text" id="taskInput" placeholder="タスクを入力…" autocomplete="off">
+    </div>
+    <div class="deadline-row">
+      <label for="deadlineInput">⏰ 締め切り</label>
+      <input type="time" id="deadlineInput">
+    </div>
     <button type="submit">追加</button>
   </form>
 
@@ -266,8 +316,8 @@
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
-  function addTask(name) {
-    tasks.unshift({ id: Date.now(), name, status: 'todo' });
+  function addTask(name, deadline) {
+    tasks.unshift({ id: Date.now(), name, deadline, status: 'todo' });
     save();
     render();
   }
@@ -322,14 +372,22 @@
       return;
     }
 
+    const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+
     list.innerHTML = visible.map(t => {
       const s = STATUS[t.status];
+      let deadlineHtml = '';
+      if (t.deadline) {
+        const [dh, dm] = t.deadline.split(':').map(Number);
+        const isOverdue = t.status !== 'done' && (dh * 60 + dm) < nowMin;
+        deadlineHtml = `<span class="deadline-tag${isOverdue ? ' overdue' : ''}">⏰ ${t.deadline}</span>`;
+      }
       return `
         <div class="task-card ${t.status === 'done' ? 'done' : ''}">
           <button class="status-badge ${s.cls}" onclick="nextStatus(${t.id})" title="タップして次の状態へ">
             ${s.label}
           </button>
-          <span class="task-name">${escHtml(t.name)}</span>
+          <span class="task-name">${escHtml(t.name)}${deadlineHtml ? '<br>' + deadlineHtml : ''}</span>
           <button class="delete-btn" onclick="deleteTask(${t.id})" title="削除">×</button>
         </div>`;
     }).join('');
@@ -344,8 +402,10 @@
     const input = document.getElementById('taskInput');
     const name = input.value.trim();
     if (!name) return;
-    addTask(name);
+    const deadline = document.getElementById('deadlineInput').value || null;
+    addTask(name, deadline);
     input.value = '';
+    document.getElementById('deadlineInput').value = '';
     input.focus();
   });
 
