@@ -23,10 +23,23 @@
       z-index: 10;
     }
 
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     header h1 {
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.3px;
+    }
+
+    #clock {
+      font-size: 15px;
+      font-weight: 500;
+      color: #8e8e93;
+      letter-spacing: 0.5px;
     }
 
     .container {
@@ -217,6 +230,7 @@
 
 <header>
   <h1>📋 Todo</h1>
+  <div id="clock"></div>
 </header>
 
 <div class="container">
@@ -345,6 +359,16 @@
   });
 
   render();
+
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
