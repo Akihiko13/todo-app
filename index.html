@@ -75,26 +75,31 @@
     /* フィルター */
     .filters {
       display: flex;
-      gap: 8px;
+      gap: 0;
       margin-bottom: 16px;
-      flex-wrap: wrap;
+      background: #e5e5ea;
+      border-radius: 12px;
+      padding: 3px;
     }
 
     .filter-btn {
-      padding: 6px 14px;
-      border: 1px solid #d1d1d6;
-      border-radius: 20px;
+      flex: 1;
+      padding: 8px 4px;
+      border: none;
+      border-radius: 9px;
       font-size: 14px;
-      background: #fff;
+      background: transparent;
       cursor: pointer;
       transition: all 0.15s;
       color: #3c3c43;
+      font-weight: 500;
     }
 
     .filter-btn.active {
-      background: #007aff;
-      border-color: #007aff;
-      color: #fff;
+      background: #fff;
+      color: #007aff;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
 
     /* タスク一覧 */
